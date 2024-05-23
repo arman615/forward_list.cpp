@@ -1,6 +1,5 @@
 #include <iostream>
 
-
 template<class T>
 class List {
 public:
@@ -8,25 +7,19 @@ public:
 
     ~List();
 
-    void push_back(T data);
-
     void push_front(T data);
-
-    void pop_back();
 
     void pop_front();
 
     void clear();
 
-    void insert(T, int);
+    void insert(T data, int index);
 
-    void removeAt(int);
+    void removeAt(int index);
 
     int getSize();
 
     bool empty();
-
-
 
     T &operator[](const int);
 
@@ -49,7 +42,6 @@ private:
     int size;
 };
 
-
 template<class T>
 List<T>::List() {
     head = nullptr;
@@ -62,41 +54,9 @@ List<T>::~List() {
 }
 
 template<class T>
-void List<T>::push_back(T data) {
-    if (head != nullptr) {
-        Node *current = head;
-        while (current->pNext != nullptr) {
-            current = current->pNext;
-        }
-        current->pNext = new Node(data);
-    } else {
-        head = new Node(data);
-    }
-    ++size;
-}
-
-template<class T>
 void List<T>::push_front(T data) {
     head = new Node(data, head);
     ++size;
-}
-
-template<class T>
-void List<T>::pop_back() {
-    if (head != nullptr) {
-        if (size == 1) {
-            delete head;
-            head = nullptr;
-        } else {
-            Node *temp = head;
-            while (temp->pNext->pNext != nullptr) {
-                temp = temp->pNext;
-            }
-            delete temp->pNext;
-            temp->pNext = nullptr;
-        }
-        --size;
-    }
 }
 
 template<class T>
@@ -112,18 +72,16 @@ void List<T>::pop_front() {
 template<class T>
 void List<T>::clear() {
     while (size) {
-        pop_back();
+        pop_front();
     }
 }
 
-
 template<class T>
 void List<T>::insert(T data, int index) {
-
     if (index <= 0) {
         push_front(data);
     } else if (index >= size) {
-        push_back(data);
+        throw std::out_of_range("Index out of bounds");
     } else {
         Node *previous = head;
         for (int i = 0; i < index - 1; ++i) {
@@ -131,17 +89,16 @@ void List<T>::insert(T data, int index) {
         }
         Node *newdata = new Node(data, previous->pNext);
         previous->pNext = newdata;
+        ++size;
     }
-    ++size;
 }
-
 
 template<class T>
 void List<T>::removeAt(int index) {
     if (index <= 0) {
         pop_front();
     } else if (index >= size - 1) {
-        pop_back();
+        throw std::out_of_range("Index out of bounds");
     } else {
         Node *previous = head;
         for (int i = 0; i < index - 1; ++i) {
@@ -150,8 +107,8 @@ void List<T>::removeAt(int index) {
         Node *toDelete = previous->pNext;
         previous->pNext = toDelete->pNext;
         delete toDelete;
+        --size;
     }
-    --size;
 }
 
 template<class T>
@@ -160,10 +117,9 @@ int List<T>::getSize() {
 }
 
 template<class T>
-bool List<T>::empty(){
-    return (size!=0);
+bool List<T>::empty() {
+    return (size != 0);
 }
-
 
 template<class T>
 T &List<T>::operator[](const int index) {
@@ -182,8 +138,8 @@ T &List<T>::operator[](const int index) {
 int main() {
     List<int> lst;
 
-    lst.push_back(5);
-    lst.push_back(10);
+    lst.push_front(5);
+    lst.push_front(10);
     lst.push_front(3);
     lst.insert(7, 2);
 
@@ -194,7 +150,6 @@ int main() {
     std::cout << std::endl;
 
     lst.pop_front();
-    lst.pop_back();
     lst.removeAt(1);
 
     std::cout << "Final elements in the list: ";
